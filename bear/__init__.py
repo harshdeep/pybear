@@ -114,7 +114,7 @@ class Note(object):
     text = None
 
     def __init__(self, bear, int_id, id, created, modified, archived, trashed,
-            deleted, pinned, title, text):
+            deleted, pinned, title, text, is_archived, is_trashed):
         self._bear = bear
         self.int_id = int_id
         self.id = id
@@ -126,6 +126,8 @@ class Note(object):
         self.pinned = pinned
         self.title = title
         self.text = text
+        self.is_archived = is_archived
+        self.is_trashed = is_trashed
 
     def tags(self):
         cursor = self._bear._db.cursor()
@@ -167,6 +169,9 @@ class Note(object):
                 os.path.join(os.path.dirname(self._bear._path),
                     "Local Files/Note Images"),
                 uri)
+
+    def is_deleted(self):
+        return self.is_archived or self.is_trashed or self.deleted
 
     def __str__(self):
         return "({}) {} ({} chars)".format(self.id, self.title, len(self.text))
@@ -241,7 +246,9 @@ class Bear(object):
             deleted = row['ZPERMANENTLYDELETED'] != 0,
             pinned = row['ZPINNED'] != 0,
             title = row['ZTITLE'],
-            text = row['ZTEXT']
+            text = row['ZTEXT'],
+            is_archived = row['ZARCHIVED'] != 0,
+            is_trashed = row['ZTRASHED'] != 0,
         )
 
     def get_note(self, id):
