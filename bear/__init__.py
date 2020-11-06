@@ -173,6 +173,9 @@ class Note(object):
     def is_deleted(self):
         return self.is_archived or self.is_trashed or self.deleted
 
+    def url(self):
+        return "bear://x-callback-url/open-note?id=" + self.id
+
     def __str__(self):
         return "({}) {} ({} chars)".format(self.id, self.title, len(self.text))
 
